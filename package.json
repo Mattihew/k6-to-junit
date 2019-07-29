@@ -1,7 +1,7 @@
 {
   "name": "k6-to-junit",
-  "version": "0.5.0",
-  "description": "",
+  "version": "0.5.1",
+  "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,9 @@
     "junit",
     "report"
   ],
+  "homepage": "https://github.com/Mattihew/k6-to-junit",
+  "bugs": "https://github.com/Mattihew/k6-to-junit/issues",
+  "repository": "github:Mattihew/k6-to-junit",
   "author": "Matt Rayner",
   "license": "MIT",
   "dependencies": {
