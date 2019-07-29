@@ -1,0 +1,31 @@
+{
+  "name": "k6-to-junit",
+  "version": "0.5.0",
+  "description": "",
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "lint": "./node_modules/.bin/eslint \"src/**\"",
+    "build": "tsc",
+    "example": "tsc && docker run -v C:\\Users\\Matt\\Code\\git\\k6tojunit:/k6 --name kgTest --rm loadimpact/k6 run --out json=k6/exampleResults.json /k6/test/example.k6.js | npm start -- stdin --out junit.xml"
+  },
+  "keywords": [
+    "k6",
+    "junit",
+    "report"
+  ],
+  "author": "Matt Rayner",
+  "license": "MIT",
+  "dependencies": {
+    "@microsoft/ts-command-line": "^4.2.6",
+    "xmlbuilder": "^13.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "@types/xmlbuilder": "^11.0.1",
+    "typescript": "^3.5.3"
+  }
+}
