@@ -8,7 +8,7 @@
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
-        "project": "./tsconfig.json",
+        "project": "./tsconfig.json"
     },
     "env": {
         "node": true,
@@ -20,6 +20,7 @@
             {
                 "allowExpressions": true
             }
-        ]
+        ],
+        "semi":"error"
     }
 }

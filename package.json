@@ -1,9 +1,9 @@
 {
   "name": "k6-to-junit",
-  "version": "0.5.1",
+  "version": "0.7.0",
   "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "bin": "dist/command.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -29,6 +29,9 @@
   "devDependencies": {
     "@types/node": "^12.6.8",
     "@types/xmlbuilder": "^11.0.1",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
+    "eslint": "^6.1.0",
     "typescript": "^3.5.3"
   }
 }
