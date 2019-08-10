@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-import { createInterface } from "readline";
 import { writeFileSync } from "fs";
 import { normalize } from "path";
 import { CommandLineParser, CommandLineAction, CommandLineStringParameter } from "@microsoft/ts-command-line";
-import { Threshold, parseLine, toXml } from './index';
-import { EOL } from 'os';
+import K6Parser from './index';
 
 class Action extends CommandLineAction {
     private _outName!: CommandLineStringParameter;
@@ -26,35 +24,13 @@ class Action extends CommandLineAction {
         });
     }
 
-    protected onExecute(): Promise<void> {
-        const results: Threshold[] = [];
-        const startTime = Date.now();
-        const rl = createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        const sout: string[] = [];
-        rl.on('line', input => {
-            sout.push(input);
-            const result = parseLine(input);
-            if (result) {
-                results.push(result);
-            }
-        });
-
-        return new Promise((resolve) => {
-            rl.on('close', () => {
-                
-                const error = results.every(res => res.passed) ? 0 : 99;
-
-                if (this._outName && this._outName.value) {
-                    writeFileSync(normalize(this._outName.value), toXml(results, startTime, sout.join(EOL)));
-                }
-
-                resolve();
-                process.exit(error);
-            });
-        });
+    protected async onExecute(): Promise<void> {
+        const k6Parser = new K6Parser();
+        await k6Parser.pipeFrom(process.stdin, {output: process.stdout});
+        if (this._outName && this._outName.value) {
+            writeFileSync(normalize(this._outName.value), k6Parser.toXml());
+        }
+        process.exit(k6Parser.allPassed() ? 0 : 99);
     }
 }
 
