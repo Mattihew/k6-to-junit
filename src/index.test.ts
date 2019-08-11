@@ -16,7 +16,8 @@ test('parse sync', () => {
     const k6Result = spawnSync('docker', k6Command);
     const text = String(k6Result.stdout);
     console.log(text);
-    const thresholds = parse(text).thresholds;
-    expect(thresholds).toHaveLength(2);
-    expect(thresholds.filter(t => t.passed)).toHaveLength(1);
+    const testSuites = parse(text);
+    expect(testSuites).toHaveLength(1);
+    expect(testSuites[0].thresholds).toHaveLength(2);
+    expect(testSuites[0].thresholds.filter(t => t.passed)).toHaveLength(1);
 });

@@ -16,6 +16,8 @@ export interface Threshold {
     systemOut: string;
 }
 
+const nameRegex = /script: (.*)$/m;
+
 function isThreshold(threshold?: unknown): threshold is Threshold {
     return Boolean(threshold && (threshold as Threshold).name);
 }
@@ -33,18 +35,23 @@ export function parseLine(line: string): Threshold | null {
 }
 
 export function parseName (line: string): string | null {
-    const nameExec = /script: (.*)$/m.exec(line);
-    return nameExec && nameExec[1] || null;
+    const name = nameRegex.exec(line);
+    return name && name[1] || null;
 }
 
-export function parse(input: string): TestSuite {
-    const thresholds = input.split(/\r?\n/).map(parseLine).filter(isThreshold);
-    const name = parseName(input) || 'test';
-    return {
-        name,
-        thresholds,
-        stdout: input
-    };
+export function parse(input: string): TestSuite[] {
+    return input.split(/vus_max.*$/gm).map(suite => {
+        const thresholds = suite.split(/\r?\n/).map(parseLine).filter(isThreshold);
+        const name = parseName(suite);
+        if (name) {
+            return {
+                name,
+                thresholds,
+                stdout: suite
+            };
+        }
+        return null;
+    }).filter(Boolean) as TestSuite[];
 }
 /**
  * https://llg.cubic.org/docs/junit/
@@ -95,42 +102,59 @@ export default class K6Parser {
     private _testSuites: TestSuite[] = [];
 
     public parse(input: string, options?: {name?: string; startTime?: number; endTime?: number}): void {
-        this._testSuites.push({...parse(input), endTime: Date.now(), ...options});
+        parse(input).forEach(testSuite => {
+            this._testSuites.push({...testSuite, endTime: Date.now(), ...options});
+        });
     }
 
     public pipeFrom(input: NodeJS.ReadStream, options?: {name?: string; startTime?: number; output?: NodeJS.WriteStream}): Promise<void> {
-        let startTime = options && options.startTime;
-        let suiteName = options && options.name;
-        const stdout: string[] = [];
-        const thresholds: Threshold[] = [];
+        let testSuite: Partial<TestSuite> & {thresholds: Threshold[]};
+        const reset = (): void => {
+            testSuite = {
+                name: options && options.name,
+                startTime: options && options.startTime,
+                stdout: '',
+                thresholds: []
+            };
+        };
+        reset();
+        const finalise = (): void => {
+            if (testSuite.name) {
+                const result = {
+                    name: testSuite.name,
+                    thresholds: testSuite.thresholds,
+                    startTime: testSuite.startTime,
+                    endTime: Date.now(),
+                    stdout: testSuite.stdout
+                };
+                this._testSuites.push(result);
+            }
+        };
+
         const rl = createInterface({input, output: options && options.output});
         rl.on('line', line => {
-            if (!startTime) {
-                startTime = Date.now();
+            if (!testSuite.startTime) {
+                testSuite.startTime = Date.now();
             }
-            stdout.push(line);
+            testSuite.stdout += line + EOL;
             const result = parseLine(line);
             if (result) {
-                thresholds.push(result);
+                testSuite.thresholds.push(result);
             }
-            if (!suiteName) {
+            if (!testSuite.name) {
                 const name = parseName(line);
                 if (name) {
-                    suiteName = name;
+                    testSuite.name = name;
                 }
             }
-            
+            if (/vus_max.*$/gm.test(line)) {
+                finalise();
+                reset();
+            }
         });
         return new Promise((res, rej) => {
             rl.on('close', () => {
-                const testSuite = {
-                    name: suiteName || 'test',
-                    thresholds,
-                    startTime,
-                    endTime: Date.now(),
-                    stdout: stdout.join(EOL)
-                };
-                this._testSuites.push(testSuite);
+                finalise();
                 res();
             });
             rl.on('SIGINT', () => {
