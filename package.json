@@ -8,6 +8,7 @@
   "scripts": {
     "test": "jest",
     "start": "node dist/command.js",
+    "format": "./node_modules/.bin/prettier --write \"src/**\"",
     "lint": "./node_modules/.bin/eslint \"src/**\"",
     "build": "tsc",
     "example": "tsc && docker run -v C:\\Users\\Matt\\Code\\git\\k6tojunit:/k6 --name kgTest --rm loadimpact/k6 run --out json=k6/exampleResults.json /k6/test/example.k6.js | npm start -- stdin --out junit.xml"
@@ -33,7 +34,10 @@
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
+    "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.3"
   }
