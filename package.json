@@ -1,6 +1,6 @@
 {
   "name": "k6-to-junit",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
   "bin": "dist/command.js",
@@ -24,21 +24,21 @@
   "author": "Matt Rayner",
   "license": "MIT",
   "dependencies": {
-    "@microsoft/ts-command-line": "^4.2.6",
+    "@microsoft/ts-command-line": "^4.3.2",
+    "tslib": "^1.10.0",
     "xmlbuilder": "^13.0.2"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.17",
-    "@types/node": "^12.7.1",
-    "@types/xmlbuilder": "^11.0.1",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.11",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "jest": "^24.8.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^24.9.0",
     "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.5.3"
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.3"
   }
 }
