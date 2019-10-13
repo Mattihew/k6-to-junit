@@ -1,6 +1,6 @@
 {
   "name": "k6-to-junit",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
   "bin": "dist/command.js",
@@ -11,7 +11,7 @@
     "format": "./node_modules/.bin/prettier --write \"src/**\"",
     "lint": "./node_modules/.bin/eslint \"src/**\"",
     "build": "tsc",
-    "example": "tsc && docker run -v C:\\Users\\Matt\\Code\\git\\k6tojunit:/k6 --name kgTest --rm loadimpact/k6 run --out json=k6/exampleResults.json /k6/test/example.k6.js | npm start -- stdin --out junit.xml"
+    "example": "cat test/out.txt test/out.txt | npm start --silent -- junit.xml"
   },
   "keywords": [
     "k6",
@@ -24,15 +24,16 @@
   "author": "Matt Rayner",
   "license": "MIT",
   "dependencies": {
-    "@microsoft/ts-command-line": "^4.3.2",
     "tslib": "^1.10.0",
-    "xmlbuilder": "^13.0.2"
+    "xmlbuilder": "^13.0.2",
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.11",
-    "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.13.0",
+    "@types/yargs": "^13.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",

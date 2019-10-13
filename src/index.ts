@@ -1,6 +1,7 @@
-import { create } from "xmlbuilder";
+import { create, streamWriter } from "xmlbuilder";
 import { createInterface } from "readline";
 import { EOL } from "os";
+import { Writable } from "stream";
 
 export interface TestSuite {
   name: string;
@@ -64,7 +65,7 @@ export function parse(input: string): TestSuite[] {
  * https://dzone.com/articles/viewing-junit-xml-files-locally
  *
  */
-export function toXml(testsuites: TestSuite[]): string {
+export function toXml(testsuites: TestSuite[], stream?: Writable): string {
   const xmlObj = create("testsuites");
   xmlObj.att("tests", testsuites.reduce((acc, ts) => acc + ts.thresholds.length, 0));
   xmlObj.att("failures", testsuites.reduce((acc, ts) => acc + ts.thresholds.filter(th => !th.passed).length, 0));
@@ -92,7 +93,9 @@ export function toXml(testsuites: TestSuite[]): string {
       if (!threshold.passed) {
         testcase.ele("failure", { message: threshold.systemOut }, threshold.systemOut);
       }
-      testcase.ele("system-out", {}, threshold.systemOut);
+      if (threshold.systemOut) {
+        testcase.ele("system-out", {}, threshold.systemOut);
+      }
     });
 
     if (testsuite.stdout) {
@@ -100,7 +103,7 @@ export function toXml(testsuites: TestSuite[]): string {
     }
   });
 
-  return xmlObj.end({ pretty: true });
+  return xmlObj.end((stream && streamWriter(stream, { pretty: true })) || { pretty: true });
 }
 
 export default class K6Parser {
@@ -179,7 +182,7 @@ export default class K6Parser {
     return this._testSuites.every(ts => ts.thresholds.every(th => th.passed));
   }
 
-  public toXml(): string {
-    return toXml(this._testSuites);
+  public toXml(stream?: Writable): string {
+    return toXml(this._testSuites, stream);
   }
 }
