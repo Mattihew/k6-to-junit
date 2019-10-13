@@ -1,7 +1,7 @@
 import { create, streamWriter } from "xmlbuilder";
 import { createInterface } from "readline";
 import { EOL } from "os";
-import { Writable } from "stream";
+import { Writable, Readable } from "stream";
 
 export interface TestSuite {
   name: string;
@@ -18,10 +18,6 @@ export interface Threshold {
 }
 
 const nameRegex = /script: (.*)$/m;
-
-function isThreshold(threshold?: unknown): threshold is Threshold {
-  return Boolean(threshold && (threshold as Threshold).name);
-}
 
 export function parseLine(line: string): Threshold | null {
   const threshold = /([✓|✗]) (\w*?)\./g.exec(line);
@@ -40,26 +36,6 @@ export function parseName(line: string): string | null {
   return (name && name[1]) || null;
 }
 
-export function parse(input: string): TestSuite[] {
-  return input
-    .split(/vus_max.*$/gm)
-    .map(suite => {
-      const thresholds = suite
-        .split(/\r?\n/)
-        .map(parseLine)
-        .filter(isThreshold);
-      const name = parseName(suite);
-      if (name) {
-        return {
-          name,
-          thresholds,
-          stdout: suite
-        };
-      }
-      return null;
-    })
-    .filter(Boolean) as TestSuite[];
-}
 /**
  * https://llg.cubic.org/docs/junit/
  * https://dzone.com/articles/viewing-junit-xml-files-locally
@@ -106,18 +82,20 @@ export function toXml(testsuites: TestSuite[], stream?: Writable): string {
   return xmlObj.end((stream && streamWriter(stream, { pretty: true })) || { pretty: true });
 }
 
-export default class K6Parser {
+export class K6Parser {
   private _testSuites: TestSuite[] = [];
 
-  public parse(input: string, options?: { name?: string; startTime?: number; endTime?: number }): void {
-    parse(input).forEach(testSuite => {
-      this._testSuites.push({ ...testSuite, endTime: Date.now(), ...options });
-    });
+  public parse(input: string, options?: { name?: string; startTime?: number; endTime?: number }): Promise<void> {
+    const inputStream = new Readable();
+    const promise = this.pipeFrom(inputStream, options);
+    inputStream.push(input);
+    inputStream.push(null);
+    return promise;
   }
 
   public pipeFrom(
-    input: NodeJS.ReadStream,
-    options?: { name?: string; startTime?: number; output?: NodeJS.WriteStream }
+    input: Readable,
+    options?: { name?: string; startTime?: number; endTime?: number; output?: Writable }
   ): Promise<void> {
     let testSuite: Partial<TestSuite> & { thresholds: Threshold[] };
     const reset = (): void => {
@@ -135,7 +113,7 @@ export default class K6Parser {
           name: testSuite.name,
           thresholds: testSuite.thresholds,
           startTime: testSuite.startTime,
-          endTime: Date.now(),
+          endTime: (options && options.endTime) || Date.now(),
           stdout: testSuite.stdout
         };
         this._testSuites.push(result);
@@ -186,3 +164,4 @@ export default class K6Parser {
     return toXml(this._testSuites, stream);
   }
 }
+export default K6Parser;

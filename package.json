@@ -1,6 +1,6 @@
 {
   "name": "k6-to-junit",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
   "bin": "dist/command.js",
@@ -11,7 +11,7 @@
     "format": "./node_modules/.bin/prettier --write \"src/**\"",
     "lint": "./node_modules/.bin/eslint \"src/**\"",
     "build": "tsc",
-    "example": "cat test/out.txt test/out.txt | npm start --silent -- junit.xml"
+    "example": "cat test/out.txt test/out.txt | npm start --silent"
   },
   "keywords": [
     "k6",
