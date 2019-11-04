@@ -1,5 +1,7 @@
 # k6-to-junit
 
+![npm](https://img.shields.io/npm/v/k6-to-junit?style=plastic) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/mattihew/k6-to-junit?label=github&style=plastic)
+
 ## Installing
 
 ```shell

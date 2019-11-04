@@ -20,7 +20,7 @@ export interface Threshold {
 const nameRegex = /script: (.*)$/m;
 
 export function parseLine(line: string): Threshold | null {
-  const threshold = /([✓|✗]) (\w*?)\./g.exec(line);
+  const threshold = /([✓|✗]) (.*?)\.*:/g.exec(line);
   if (threshold && threshold.length > 2) {
     return {
       systemOut: line,
@@ -33,7 +33,7 @@ export function parseLine(line: string): Threshold | null {
 
 export function parseName(line: string): string | null {
   const name = nameRegex.exec(line);
-  return (name && name[1]) || null;
+  return name && name[1];
 }
 
 /**
@@ -79,7 +79,7 @@ export function toXml(testsuites: TestSuite[], stream?: Writable): string {
     }
   });
 
-  return xmlObj.end((stream && streamWriter(stream, { pretty: true })) || { pretty: true });
+  return xmlObj.end(stream ? streamWriter(stream, { pretty: true }) : { pretty: true });
 }
 
 export class K6Parser {
