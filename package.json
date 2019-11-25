@@ -11,7 +11,7 @@
     "format": "./node_modules/.bin/prettier --write \"src/**\"",
     "lint": "./node_modules/.bin/eslint \"src/**\"",
     "build": "tsc",
-    "example": "cat test/out.txt test/out.txt | npm start --silent"
+    "example": "cat test/out.txt | npm start --silent"
   },
   "keywords": [
     "k6",
