@@ -20,7 +20,7 @@ export interface Threshold {
 const nameRegex = /script: (.*)$/m;
 
 export function parseLine(line: string): Threshold | null {
-  const threshold = /([✓|✗]) (.*?)\.*:/g.exec(line);
+  const threshold = /([✓|✗]) (.*?)\.+:/g.exec(line);
   if (threshold && threshold.length > 2) {
     return {
       systemOut: line,

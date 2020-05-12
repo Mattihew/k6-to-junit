@@ -1,6 +1,6 @@
 {
   "name": "k6-to-junit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "tool to convert k6 output to junit xml",
   "main": "dist/index.js",
   "bin": "dist/command.js",
