@@ -149,15 +149,20 @@ k6Parser.toXml(fs.createWriteStream("junit.xml"));
 ## Examples
 
 ```javascript
+
 const { spawn } = require("child_process");
 const { createWriteStream } = require("fs");
 const { K6Parser } = require("k6-to-junit");
+
 const parser = new K6Parser();
-parser.pipefrom(spawn("k6", ["run", "k6test.js"]).stdio).then(() => {
+const test = spawn("k6", ["run", "test.js"]);
+
+parser.pipeFrom(test.stdout).then(() => {
   const writer = createWriteStream("junit.xml");
   parser.toXml(writer);
   writer.once("finished", () => {
-    process.exit(k6Parser.allPassed() ? 0 : 99);
+    process.exit(parser.allPassed() ? 0 : 99);
   });
 });
+
 ```
